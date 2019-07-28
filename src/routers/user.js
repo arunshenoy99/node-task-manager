@@ -1,11 +1,7 @@
 const express = require('express')
 const User = require('../models/user')
+const auth = require('../middleware/auth')
 const router = new express.Router()
-
-router.get('/test',(req,res)=>{
-    res.send('From a new file')
-})
-
 
 //CREATE NEW USER
 router.post('/users',async(req,res)=>{
@@ -19,6 +15,9 @@ router.post('/users',async(req,res)=>{
     }
 })
 
+
+//LOGIN A USER
+
 router.post('/users/login',async(req,res)=>{
     try{
         const user = await User.findByCredentials(req.body.email,req.body.password)
@@ -31,21 +30,16 @@ router.post('/users/login',async(req,res)=>{
 
 
 //FIND ALL USERS
-router.get('/users',async(req,res)=>{
-    try{
-        const users = await User.find({})
-        res.send(users)
-    }catch(e){
-        res.status(200).send(e)
-    }
+router.get('/users/me',auth,async(req,res)=>{
+    res.send(req.user)
     
 })
 
 //FIND USER BY ID
 
-router.get('/users/:id',(req ,res)=>{
+router.get('/users/:id',async(req ,res)=>{
     try{
-        const user = User.findById(req.params.id)
+        const user = await User.findById(req.params.id)
         if(!user){
             return res.status(404).send({error:'User not found'})
         }
