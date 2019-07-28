@@ -28,11 +28,32 @@ router.post('/users/login',async(req,res)=>{
     }
 })
 
+//LOGOUT A USER
+router.post('/users/logout',auth,async(req,res)=>{
+    try{
+        req.user.tokens=req.user.tokens.filter((token)=>{return token.token!=req.token})
+        await req.user.save()
+        res.send()
+    }catch(e){
+        res.status(500).send()
+    }
+})
+
+//LOGOUT OF ALL SESSIONS
+router.post('/users/logoutAll',auth,async(req,res)=>{
+    try{
+        req.user.tokens = []
+        await req.user.save()
+        res.send()
+    }catch(e){
+        res.status(500).send(e)
+    }
+})
+
 
 //FIND ALL USERS
 router.get('/users/me',auth,async(req,res)=>{
     res.send(req.user)
-    
 })
 
 //FIND USER BY ID
@@ -83,7 +104,6 @@ router.delete('/users/:id',async(req,res)=>{
         res.status(400).send()
     }
 })
-
 
 
 
