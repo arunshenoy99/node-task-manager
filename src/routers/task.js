@@ -18,12 +18,28 @@ router.post('/tasks',auth,async(req,res)=>{
     }
 })
 
-//FIND ALL TASKS
-
+//FIND ALL TASKS QUERY(completed=true or false,limit=number,skip=number,sortBy=createdAt)
 router.get('/tasks',auth,async(req,res)=>{
+    const match = {}
+    const sort = {}
+        if(req.query.completed){
+            match.completed=req.query.completed ==='true'    //GIVES BACK BOOLEAN INSTEAD OF STRING TRUE OR FALSE
+        }
+        if(req.query.sortBy){
+            const parts = req.query.sortBy.split('_')
+            sort[parts[0]] = parts[1]==='desc'?-1:1
+        }
     try{
         // const tasks=await Task.find({owner:req.user._id})
-        await req.user.populate('tasks').execPopulate()
+        await req.user.populate({
+            path:'tasks',
+            match,
+            options:{
+                limit:parseInt(req.query.limit),
+                skip:parseInt(req.query.skip),
+                sort
+            }
+        }).execPopulate()
         res.send(req.user.tasks)
     }catch(e){
         res.status(500).send(e)
