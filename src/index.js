@@ -5,7 +5,7 @@ const app = express()
 const userRouter=require('./routers/user')
 const taskRouter=require('./routers/task')
 //Paths 
-const port = process.env.PORT||3000
+const port = process.env.PORT
 
 //Configure JSON AND EXPRESS SERVER
 app.use(express.json())
